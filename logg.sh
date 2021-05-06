@@ -16,12 +16,16 @@ exit 0
 }
 
 finish() {
-  last_line=$(tail -1 ${log_file}) # 得到了最后一行
   # 检查last_line字段数是否为3
+  if ! [[ -e $log_file ]]; then
+    echo "log file does not exist"
+    exit 1
+  fi
+  last_line=$(tail -1 ${log_file}) # 得到了最后一行
   nf=$( echo $last_line | awk -F ';' '{print NF}')
   # echo $nf
   if (( nf>3  )) ; then
-    echo "have finish"
+    echo "nothing"
     echo $last_line
     exit 1
   fi
@@ -41,14 +45,16 @@ elif [[ "$1" == "-h" ]] || [[ "$1" == "--help" ]];then
 elif [[ "$1" == "clean" ]];then
   rm $log_file
 else
-  last_line=$(tail -1 ${log_file}) # 得到了最后一行
-  # 检查last_line字段数是否为3
-  nf=$( echo $last_line | awk -F ';' '{print NF}')
-  # echo $nf
-  if (( nf<5  )) ; then
-    echo "haven't finish"
-    echo $last_line
-    exit 1
+  if [[ -e ${log_file} ]]; then
+    last_line=$(tail -1 ${log_file}) # 得到了最后一行
+    # 检查last_line字段数是否为3
+    nf=$( echo $last_line | awk -F ';' '{print NF}')
+    # echo $nf
+    if (( nf<5  )) ; then
+      echo "haven't finish"
+      echo $last_line
+      exit 1
+    fi
   fi
   tag=$1
   description=$2
