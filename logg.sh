@@ -21,6 +21,7 @@ finish() {
   cur_time="$(date +'%H:%M %m/%d/%Y')"
   cur_time_in_seconds=$( date -u -d "$cur_time" +"%s" ) # 这里是错误, 应该会是起始日期, 而不是当前日期
   diff_time="$(date -u -d "0 $cur_time_in_seconds seconds - $last_time_in_seconds seconds" +'%H:%M')" # 注意这里前面的seconds不可省略, 有2个seconds
+  sed -i "$ d" $log_file
   echo $last_line | awk -v last_time="$last_time" -v cur_time="$cur_time" -v diff_time="$diff_time" '{FS=OFS=";"}{$1=last_time ";" cur_time ";" diff_time ; print $0}' >> $log_file
 }
 
