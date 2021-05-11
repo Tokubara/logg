@@ -2,16 +2,18 @@
 # logg finish/或者fi
 # logg -h
 
-# log_file=~/.logg
-log_file=logg.txt
+log_file=~/.logg
+# log_file=logg.txt
 
 # TODO 看看支持的time格式
 print_usage() {
   cat <<- EOF
-example
-logg kv,debug 读tracker
-logg fi[nish] [-t time(12:23|5/10 12:23|yesterdat 12:23)] [-d description]
-logg add start_time end_time tags(splitted by ,) description
+time format: 12:23|5/10 12:23|yesterdat 12:23
+tags is splitted by ,
+
+logg tags description
+logg fi[nish] [-t time] [-d description]
+logg add start_time end_time tags description
 logg now: echo the last event
 logg -h
 logg clean
@@ -63,7 +65,7 @@ finish() {
 
   end_time="$(date +'%H:%M %m/%d/%Y')" # 是那种写法, 不确定后面会不会被改写, 就这样先写着
   description=$( echo $last_line | awk -F ';' '{print $3}') # 本来description是第3字段
-  finish_parse_arg $* # 获得了description和end_time
+  finish_parse_arg "$@" # 获得了description和end_time
 
   start_time=$(echo $last_line | cut -d ';' -f 1 )
   start_time_in_seconds=$( date -u -d "$start_time" +"%s" )
@@ -125,20 +127,23 @@ print_now() {
 case "$1" in
   fi*)
     shift
-    finish $*
+    finish "$@"
+  ;;
   -h|--help)
     print_usage
+  ;;
   clean)
     rm $log_file
+  ;;
   add)
-    add_event
+    shift
+    add_event "$@"
+  ;;
   now)
     print_now
+  ;;
   *)
-    add_now $*
+    add_now "$@"
+  ;;
 esac
-
-
-
-
 
